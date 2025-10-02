@@ -18,7 +18,29 @@ services:
       - guacamole-net
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
+
+  # One-time database initialization
+  db-init:
+    image: postgres:15
+    depends_on:
+      - postgres
+    networks:
+      - guacamole-net
+    environment:
+      PGPASSWORD: guacamole_password
+    volumes:
+      - ./initdb.sql:/initdb.sql:ro
+    command: >
+      bash -c "
+        until pg_isready -h postgres -U guacamole_user; do
+          echo 'Waiting for postgres...'
+          sleep 2
+        done
+        echo 'PostgreSQL is ready. Running initialization...'
+        psql -h postgres -U guacamole_user -d guacamole_db -f /initdb.sql
+        echo 'Database initialized successfully!'
+      "
+    restart: "no"
 
   guacamole:
     image: guacamole/guacamole
@@ -34,12 +56,12 @@ services:
       POSTGRESQL_DATABASE: guacamole_db
       POSTGRESQL_USER: guacamole_user
       POSTGRESQL_PASSWORD: guacamole_password
-      POSTGRESQL_AUTO_CREATE_ACCOUNTS: "true"
     networks:
       - guacamole-net
     depends_on:
       - guacd
       - postgres
+      - db-init
 
 networks:
   guacamole-net:
