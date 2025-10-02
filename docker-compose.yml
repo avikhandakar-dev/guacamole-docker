@@ -25,12 +25,12 @@ services:
     container_name: guacamole
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       GUACD_HOSTNAME: guacd
       GUACD_PORT: 4822
       POSTGRESQL_HOSTNAME: postgres
-      POSTGRESQL_PORT: 5459
+      POSTGRESQL_PORT: 5432
       POSTGRESQL_DATABASE: guacamole_db
       POSTGRESQL_USER: guacamole_user
       POSTGRESQL_PASSWORD: guacamole_password
