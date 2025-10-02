@@ -7,7 +7,9 @@ services:
       - guacamole-net
 
   postgres:
-    image: postgres:15
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
     container_name: guacamole-postgres
     restart: unless-stopped
     environment:
@@ -33,7 +35,6 @@ services:
       POSTGRESQL_DATABASE: guacamole_db
       POSTGRESQL_USER: guacamole_user
       POSTGRESQL_PASSWORD: guacamole_password
-      POSTGRESQL_AUTO_CREATE_ACCOUNTS: "true"
     networks:
       - guacamole-net
     depends_on:
